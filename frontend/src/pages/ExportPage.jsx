@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { format, startOfMonth, startOfToday, subDays } from 'date-fns';
 import PageHeader from '../components/PageHeader';
 import ChipSelector from '../components/ChipSelector';
-import { listCategories } from '../api/categories';
 import { exportAndShare } from '../api/exportApi';
 
 const RANGE_PRESETS = [
@@ -29,17 +27,12 @@ export default function ExportPage() {
   const [rangePreset, setRangePreset] = useState('month');
   const [customStart, setCustomStart] = useState(format(subDays(new Date(), 7), 'yyyy-MM-dd'));
   const [customEnd, setCustomEnd] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [category, setCategory] = useState('All');
   const [paymentMethod, setPaymentMethod] = useState('All');
   const [busy, setBusy] = useState(null); // 'pdf' | 'excel' | null
   const [message, setMessage] = useState(null); // { type, text }
 
-  const { data: categoriesData } = useQuery({ queryKey: ['categories'], queryFn: listCategories });
-  const categoryOptions = ['All', ...(categoriesData?.map((c) => c.name) || [])];
-
   const buildFilters = () => ({
     ...presetToRange(rangePreset, customStart, customEnd),
-    category: category === 'All' ? undefined : category,
     paymentMethod: paymentMethod === 'All' ? undefined : paymentMethod,
   });
 
@@ -70,9 +63,6 @@ export default function ExportPage() {
             <input type="date" className="text-input" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} />
           </div>
         )}
-
-        <span className="field-label">Category</span>
-        <ChipSelector options={categoryOptions} value={category} onChange={setCategory} />
 
         <span className="field-label">Payment Method</span>
         <ChipSelector options={PAYMENT_METHODS} value={paymentMethod} onChange={setPaymentMethod} />

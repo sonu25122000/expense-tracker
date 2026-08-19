@@ -16,7 +16,6 @@ import ExpenseListItem from '../components/ExpenseListItem';
 import EmptyState from '../components/EmptyState';
 import ConfirmModal from '../components/ConfirmModal';
 import { listExpenses, deleteExpense } from '../api/expenses';
-import { listCategories } from '../api/categories';
 import { formatCurrency } from '../utils/format';
 import { useSettings } from '../context/SettingsContext';
 
@@ -66,25 +65,20 @@ export default function ExpenseHistoryPage() {
   const [datePreset, setDatePreset] = useState('all');
   const [customStart, setCustomStart] = useState(format(subDays(new Date(), 7), 'yyyy-MM-dd'));
   const [customEnd, setCustomEnd] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [category, setCategory] = useState('All');
   const [paymentMethod, setPaymentMethod] = useState('All');
   const [minAmount, setMinAmount] = useState('');
   const [maxAmount, setMaxAmount] = useState('');
   const [pendingDelete, setPendingDelete] = useState(null);
 
-  const { data: categoriesData } = useQuery({ queryKey: ['categories'], queryFn: listCategories });
-  const categoryOptions = ['All', ...(categoriesData?.map((c) => c.name) || [])];
-
   const filters = useMemo(
     () => ({
       ...presetToRange(datePreset, customStart, customEnd),
-      category: category === 'All' ? undefined : category,
       paymentMethod: paymentMethod === 'All' ? undefined : paymentMethod,
       minAmount: minAmount || undefined,
       maxAmount: maxAmount || undefined,
       search: search || undefined,
     }),
-    [datePreset, customStart, customEnd, category, paymentMethod, minAmount, maxAmount, search]
+    [datePreset, customStart, customEnd, paymentMethod, minAmount, maxAmount, search]
   );
 
   const { data, isLoading } = useQuery({
@@ -131,9 +125,6 @@ export default function ExpenseHistoryPage() {
             />
           </div>
         )}
-        <div style={{ margin: '8px 0' }}>
-          <ChipSelector options={categoryOptions} value={category} onChange={setCategory} />
-        </div>
         <div style={{ margin: '8px 0' }}>
           <ChipSelector options={PAYMENT_METHODS} value={paymentMethod} onChange={setPaymentMethod} />
         </div>
