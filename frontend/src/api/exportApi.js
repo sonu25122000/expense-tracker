@@ -25,10 +25,6 @@ function blobToBase64(blob) {
 export async function exportAndShare(type, filters = {}) {
   const url = buildExportUrl(type, filters);
   const ext = type === 'pdf' ? 'pdf' : 'xlsx';
-  const mimeType =
-    type === 'pdf'
-      ? 'application/pdf'
-      : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
   const token = getAuthToken();
   const response = await fetch(url, {
@@ -47,18 +43,6 @@ export async function exportAndShare(type, filters = {}) {
     });
     await Share.share({ title: 'Expense export', url: written.uri, dialogTitle: `Share ${type.toUpperCase()}` });
     return written.uri;
-  }
-
-  if (navigator.canShare && navigator.share) {
-    try {
-      const file = new File([blob], filename, { type: mimeType });
-      if (navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: filename });
-        return filename;
-      }
-    } catch (err) {
-      // fall through to plain download
-    }
   }
 
   const objectUrl = URL.createObjectURL(blob);
