@@ -1,7 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { getServerUrl } from './client';
+import { getServerUrl, getAuthToken } from './client';
 
 function buildExportUrl(type, filters = {}) {
   const base = getServerUrl();
@@ -30,7 +30,10 @@ export async function exportAndShare(type, filters = {}) {
       ? 'application/pdf'
       : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
-  const response = await fetch(url);
+  const token = getAuthToken();
+  const response = await fetch(url, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   if (!response.ok) throw new Error(`Export failed (${response.status})`);
   const blob = await response.blob();
   const filename = `expenses-${Date.now()}.${ext}`;

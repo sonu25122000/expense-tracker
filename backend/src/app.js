@@ -3,11 +3,13 @@ const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
 
+const authRoutes = require('./routes/auth');
 const expenseRoutes = require('./routes/expenses');
 const categoryRoutes = require('./routes/categories');
 const dashboardRoutes = require('./routes/dashboard');
 const reportRoutes = require('./routes/reports');
 const exportRoutes = require('./routes/export');
+const requireAuth = require('./middleware/auth');
 
 const app = express();
 
@@ -18,12 +20,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.use('/api/auth', authRoutes);
 
-app.use('/api/expenses', expenseRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/reports', reportRoutes);
-app.use('/api/export', exportRoutes);
+app.use('/api/expenses', requireAuth, expenseRoutes);
+app.use('/api/categories', requireAuth, categoryRoutes);
+app.use('/api/dashboard', requireAuth, dashboardRoutes);
+app.use('/api/reports', requireAuth, reportRoutes);
+app.use('/api/export', requireAuth, exportRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
