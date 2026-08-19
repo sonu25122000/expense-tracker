@@ -1,5 +1,11 @@
 import { useRef } from 'react';
 
+// "Take Photo" (capture=environment) only makes sense where there's a
+// rear-facing camera to hint at; desktop browsers ignore or silently drop
+// it, so only offer that button on touch devices.
+const isTouchDevice =
+  typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
 // file: a File object for a newly picked image, null if removed/none.
 // existingUrl: URL of an already-saved receipt (edit mode).
 export default function ReceiptPicker({ file, existingUrl, onChange }) {
@@ -53,16 +59,18 @@ export default function ReceiptPicker({ file, existingUrl, onChange }) {
             style={{ flex: '1 1 150px' }}
             onClick={() => galleryInputRef.current?.click()}
           >
-            🖼️ Choose from Gallery
+            {isTouchDevice ? '🖼️ Choose from Gallery' : '📁 Upload Photo'}
           </button>
-          <button
-            type="button"
-            className="button button-secondary"
-            style={{ flex: '1 1 150px' }}
-            onClick={() => cameraInputRef.current?.click()}
-          >
-            📷 Take Photo
-          </button>
+          {isTouchDevice && (
+            <button
+              type="button"
+              className="button button-secondary"
+              style={{ flex: '1 1 150px' }}
+              onClick={() => cameraInputRef.current?.click()}
+            >
+              📷 Take Photo
+            </button>
+          )}
         </div>
       )}
       <input
@@ -72,14 +80,16 @@ export default function ReceiptPicker({ file, existingUrl, onChange }) {
         style={{ display: 'none' }}
         onChange={handlePicked}
       />
-      <input
-        ref={cameraInputRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        style={{ display: 'none' }}
-        onChange={handlePicked}
-      />
+      {isTouchDevice && (
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          style={{ display: 'none' }}
+          onChange={handlePicked}
+        />
+      )}
     </div>
   );
 }
