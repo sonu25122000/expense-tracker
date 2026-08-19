@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '../components/PageHeader';
 import ChipSelector from '../components/ChipSelector';
 import ReceiptPicker from '../components/ReceiptPicker';
-import { listCategories } from '../api/categories';
 import { createExpense, updateExpense, getExpense } from '../api/expenses';
 import { toApiDateString } from '../utils/format';
 
@@ -27,8 +26,6 @@ export default function AddExpensePage() {
   const [formError, setFormError] = useState('');
   const [savedMessage, setSavedMessage] = useState('');
 
-  const { data: categories } = useQuery({ queryKey: ['categories'], queryFn: listCategories });
-
   useEffect(() => {
     if (!isEdit) return;
     (async () => {
@@ -48,16 +45,10 @@ export default function AddExpensePage() {
     })();
   }, [id, isEdit]);
 
-  useEffect(() => {
-    if (!isEdit && !category && categories?.length) {
-      setCategory(categories[0].name);
-    }
-  }, [categories, isEdit, category]);
-
   const resetForm = () => {
     setDate(toApiDateString(new Date()));
     setAmount('');
-    setCategory(categories?.[0]?.name || '');
+    setCategory('');
     setPaymentMethod('Cash');
     setDescription('');
     setReceiptFile(undefined);
@@ -155,14 +146,8 @@ export default function AddExpensePage() {
                 placeholder="e.g. Food, Travel, Rent"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                list="category-suggestions"
                 autoComplete="off"
               />
-              <datalist id="category-suggestions">
-                {(categories || []).map((cat) => (
-                  <option key={cat._id || cat.name} value={cat.name} />
-                ))}
-              </datalist>
             </div>
 
             <div>

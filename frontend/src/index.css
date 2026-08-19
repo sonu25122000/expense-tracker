@@ -238,7 +238,7 @@ select:focus-visible {
     padding: var(--space-xl) var(--space-xxl);
   }
   .summary-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: var(--space-lg);
   }
   .charts-grid {
@@ -277,10 +277,7 @@ select:focus-visible {
 
 @media (min-width: 1300px) {
   .app-content {
-    max-width: 1200px;
-  }
-  .summary-grid {
-    grid-template-columns: repeat(4, 1fr);
+    max-width: 1180px;
   }
 }
 
@@ -352,7 +349,15 @@ select:focus-visible {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  padding: var(--space-lg) var(--space-sm) var(--space-sm);
+  padding: var(--space-lg) var(--space-md) var(--space-sm);
+  height: 100%;
+}
+
+.chart-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-md);
 }
 
 /* Chips */

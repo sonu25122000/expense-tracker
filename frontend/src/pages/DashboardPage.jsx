@@ -63,58 +63,50 @@ export default function DashboardPage() {
         </div>
 
         <div className="charts-grid">
-          <div className="span-2">
-            <p className="section-title" style={{ marginTop: 'var(--space-lg)' }}>
-              Daily Trend (last 30 days)
-            </p>
-            <div className="chart-card">
-              <ResponsiveContainer width="100%" height={220}>
-                <LineChart data={trendData} margin={{ left: -20, right: 12 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis dataKey="date" interval={4} tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
-                  <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
-                  <Tooltip formatter={(v) => formatCurrency(v, currency)} />
-                  <Line type="monotone" dataKey="total" stroke="#2a78d6" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+          <div className="span-2 chart-card">
+            <p className="chart-card-title">Daily Trend (last 30 days)</p>
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={trendData} margin={{ left: -20, right: 12 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="date" interval={4} tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                <Tooltip formatter={(v) => formatCurrency(v, currency)} />
+                <Line type="monotone" dataKey="total" stroke="#2a78d6" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
 
-          <div>
-            <p className="section-title">Category-wise Spending (this month)</p>
+          <div className="chart-card">
+            <p className="chart-card-title">Category-wise Spending (this month)</p>
             {categoryData.length ? (
-              <div className="chart-card">
-                <ResponsiveContainer width="100%" height={240}>
-                  <PieChart>
-                    <Pie data={categoryData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                      {categoryData.map((entry, i) => (
-                        <Cell key={entry.name} fill={colorForIndex(i)} />
-                      ))}
-                    </Pie>
-                    <Legend />
-                    <Tooltip formatter={(v) => formatCurrency(v, currency)} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+              <ResponsiveContainer width="100%" height={260}>
+                <PieChart>
+                  <Pie data={categoryData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={2}>
+                    {categoryData.map((entry, i) => (
+                      <Cell key={entry.name} fill={colorForIndex(i)} />
+                    ))}
+                  </Pie>
+                  <Legend />
+                  <Tooltip formatter={(v) => formatCurrency(v, currency)} />
+                </PieChart>
+              </ResponsiveContainer>
             ) : (
               <EmptyState icon="🥧" title="No spending yet this month" />
             )}
           </div>
 
-          <div>
-            <p className="section-title">Payment Method Breakdown (this month)</p>
+          <div className="chart-card">
+            <p className="chart-card-title">Payment Method Breakdown (this month)</p>
             {paymentData.length ? (
-              <div className="chart-card">
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={paymentData} margin={{ left: -20, right: 12 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
-                    <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
-                    <Tooltip formatter={(v) => formatCurrency(v, currency)} />
-                    <Bar dataKey="total" fill="#2a78d6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={paymentData} margin={{ left: -20, right: 12 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                  <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                  <Tooltip formatter={(v) => formatCurrency(v, currency)} />
+                  <Bar dataKey="total" fill="#2a78d6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             ) : (
               <EmptyState icon="📊" title="No spending yet this month" />
             )}
