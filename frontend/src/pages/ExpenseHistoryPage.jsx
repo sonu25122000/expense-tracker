@@ -106,7 +106,7 @@ export default function ExpenseHistoryPage() {
   return (
     <>
       <PageHeader title="Expense History" />
-      <div style={{ padding: '0 var(--space-lg)', background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
+      <div className="filter-panel">
         <input
           className="text-input"
           placeholder="🔍 Search description or category"

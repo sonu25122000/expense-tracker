@@ -35,22 +35,17 @@ export default function AccountSetupPage() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100dvh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 24,
-      }}
-    >
-      <form onSubmit={handleSubmit} style={{ maxWidth: 380, width: '100%', textAlign: 'center' }}>
-        <div style={{ fontSize: 48 }}>🔐</div>
-        <h1 style={{ fontSize: 22, margin: '16px 0 8px' }}>Create your account</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>
+    <div className="auth-screen">
+      <form className="auth-card" onSubmit={handleSubmit}>
+        <div className="auth-badge">🔐</div>
+        <h1 className="auth-title">Create your account</h1>
+        <p className="auth-subtitle">
           Set a username and password to protect access to your expenses. You'll use this to log
           in every time you open the app.
         </p>
+
+        {error && <div className="auth-error">{error}</div>}
+
         <input
           className="text-input"
           placeholder="Username"
@@ -58,7 +53,6 @@ export default function AccountSetupPage() {
           onChange={(e) => setUsername(e.target.value)}
           autoCapitalize="none"
           autoCorrect="off"
-          style={{ marginBottom: 12 }}
         />
         <input
           className="text-input"
@@ -66,7 +60,6 @@ export default function AccountSetupPage() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ marginBottom: 12 }}
         />
         <input
           className="text-input"
@@ -74,10 +67,8 @@ export default function AccountSetupPage() {
           type="password"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          style={{ marginBottom: 12 }}
         />
-        {error && <p style={{ color: 'var(--danger)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
-        <button type="submit" className="button button-primary" disabled={busy}>
+        <button type="submit" className="button button-primary" disabled={busy} style={{ marginTop: 4 }}>
           {busy ? 'Creating…' : 'Create Account'}
         </button>
       </form>

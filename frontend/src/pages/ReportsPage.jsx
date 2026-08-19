@@ -51,9 +51,10 @@ export default function ReportsPage() {
         ) : (
           <>
             <div className="summary-grid">
-              <SummaryCard label="Total" value={formatCurrency(data.total, currency)} />
-              <SummaryCard label="Transactions" value={String(data.transactionCount)} />
+              <SummaryCard icon="💰" label="Total" value={formatCurrency(data.total, currency)} />
+              <SummaryCard icon="🧾" label="Transactions" value={String(data.transactionCount)} />
               <SummaryCard
+                icon="🔺"
                 label={`Highest Spending ${bucketLabel}`}
                 value={
                   data.highestSpendingBucket
@@ -63,6 +64,7 @@ export default function ReportsPage() {
                 sublabel={data.highestSpendingBucket?.bucket}
               />
               <SummaryCard
+                icon="📊"
                 label={`Average per ${bucketLabel}`}
                 value={formatCurrency(data.averagePerBucket, currency)}
               />

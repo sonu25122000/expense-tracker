@@ -32,7 +32,7 @@ export default function ExportPage() {
   const [category, setCategory] = useState('All');
   const [paymentMethod, setPaymentMethod] = useState('All');
   const [busy, setBusy] = useState(null); // 'pdf' | 'excel' | null
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(null); // { type, text }
 
   const { data: categoriesData } = useQuery({ queryKey: ['categories'], queryFn: listCategories });
   const categoryOptions = ['All', ...(categoriesData?.map((c) => c.name) || [])];
@@ -45,12 +45,12 @@ export default function ExportPage() {
 
   const handleExport = async (type) => {
     setBusy(type);
-    setMessage('');
+    setMessage(null);
     try {
       await exportAndShare(type, buildFilters());
-      setMessage(`${type.toUpperCase()} export ready.`);
+      setMessage({ type: 'success', text: `${type.toUpperCase()} export ready.` });
     } catch (err) {
-      setMessage(`Export failed: ${err.message}`);
+      setMessage({ type: 'error', text: `Export failed: ${err.message}` });
     } finally {
       setBusy(null);
     }
@@ -85,7 +85,11 @@ export default function ExportPage() {
             {busy === 'excel' ? 'Exporting…' : '📊 Export Excel'}
           </button>
         </div>
-        {message && <p style={{ fontSize: 13, marginTop: 12, color: 'var(--text-secondary)' }}>{message}</p>}
+        {message && (
+          <div className={message.type === 'success' ? 'banner-success' : 'banner-error'} style={{ marginTop: 12 }}>
+            {message.text}
+          </div>
+        )}
       </div>
     </>
   );

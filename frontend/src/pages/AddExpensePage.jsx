@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '../components/PageHeader';
-import CategoryGrid from '../components/CategoryGrid';
 import ChipSelector from '../components/ChipSelector';
 import ReceiptPicker from '../components/ReceiptPicker';
 import { listCategories } from '../api/categories';
 import { createExpense, updateExpense, getExpense } from '../api/expenses';
 import { toApiDateString } from '../utils/format';
+import { iconForCategory } from '../theme';
 
 const PAYMENT_METHODS = ['Cash', 'UPI', 'Card', 'Bank Transfer', 'Other'];
 
@@ -140,7 +140,18 @@ export default function AddExpensePage() {
           />
 
           <span className="field-label">Category</span>
-          <CategoryGrid categories={categories || []} value={category} onChange={setCategory} />
+          <select
+            className="select-input"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            {!category && <option value="">Select a category</option>}
+            {(categories || []).map((cat) => (
+              <option key={cat._id || cat.name} value={cat.name}>
+                {iconForCategory(cat.name)} {cat.name}
+              </option>
+            ))}
+          </select>
 
           <span className="field-label">Payment Method</span>
           <ChipSelector options={PAYMENT_METHODS} value={paymentMethod} onChange={setPaymentMethod} />
@@ -160,8 +171,8 @@ export default function AddExpensePage() {
             onChange={setReceiptFile}
           />
 
-          {formError && <p style={{ color: 'var(--danger)', fontSize: 13, marginTop: 16 }}>{formError}</p>}
-          {savedMessage && <p style={{ color: 'var(--success)', fontSize: 13, marginTop: 16 }}>{savedMessage}</p>}
+          {formError && <div className="banner-error" style={{ marginTop: 16 }}>{formError}</div>}
+          {savedMessage && <div className="banner-success" style={{ marginTop: 16 }}>{savedMessage}</div>}
 
           <button type="submit" className="button button-primary" style={{ marginTop: 24 }} disabled={mutation.isPending}>
             {mutation.isPending ? 'Saving…' : isEdit ? 'Update Expense' : 'Save Expense'}

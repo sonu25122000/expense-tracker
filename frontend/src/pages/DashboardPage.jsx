@@ -49,16 +49,17 @@ export default function DashboardPage() {
       <PageHeader title="Dashboard" />
       <div className="app-content">
         <div className="summary-grid">
-          <SummaryCard label="Today" value={formatCurrency(data.totalToday, currency)} />
-          <SummaryCard label="This Week" value={formatCurrency(data.totalThisWeek, currency)} />
-          <SummaryCard label="This Month" value={formatCurrency(data.totalThisMonth, currency)} />
-          <SummaryCard label="Transactions" value={String(data.totalTransactions)} />
+          <SummaryCard icon="📅" label="Today" value={formatCurrency(data.totalToday, currency)} />
+          <SummaryCard icon="🗓️" label="This Week" value={formatCurrency(data.totalThisWeek, currency)} />
+          <SummaryCard icon="📆" label="This Month" value={formatCurrency(data.totalThisMonth, currency)} />
+          <SummaryCard icon="🧾" label="Transactions" value={String(data.totalTransactions)} />
           <SummaryCard
+            icon="🔺"
             label="Highest Expense"
             value={data.highestExpense ? formatCurrency(data.highestExpense.amount, currency) : '—'}
             sublabel={data.highestExpense?.category}
           />
-          <SummaryCard label="Avg. Daily (this month)" value={formatCurrency(data.averageDailyExpense, currency)} />
+          <SummaryCard icon="📊" label="Avg. Daily (this month)" value={formatCurrency(data.averageDailyExpense, currency)} />
         </div>
 
         <p className="section-title">Category-wise Spending (this month)</p>

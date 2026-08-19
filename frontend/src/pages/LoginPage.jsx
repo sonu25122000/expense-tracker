@@ -22,18 +22,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100dvh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 24,
-      }}
-    >
-      <form onSubmit={handleSubmit} style={{ maxWidth: 360, width: '100%', textAlign: 'center' }}>
-        <div style={{ fontSize: 48 }}>💰</div>
-        <h1 style={{ fontSize: 22, margin: '16px 0 24px' }}>Log in</h1>
+    <div className="auth-screen">
+      <form className="auth-card" onSubmit={handleSubmit}>
+        <div className="auth-badge">💰</div>
+        <h1 className="auth-title">Welcome back</h1>
+        <p className="auth-subtitle">Log in to view and manage your expenses.</p>
+
+        {error && <div className="auth-error">{error}</div>}
+
         <input
           className="text-input"
           placeholder="Username"
@@ -41,7 +37,6 @@ export default function LoginPage() {
           onChange={(e) => setUsername(e.target.value)}
           autoCapitalize="none"
           autoCorrect="off"
-          style={{ marginBottom: 12 }}
         />
         <input
           className="text-input"
@@ -49,10 +44,8 @@ export default function LoginPage() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ marginBottom: 12 }}
         />
-        {error && <p style={{ color: 'var(--danger)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
-        <button type="submit" className="button button-primary" disabled={busy}>
+        <button type="submit" className="button button-primary" disabled={busy} style={{ marginTop: 4 }}>
           {busy ? 'Logging in…' : 'Log In'}
         </button>
       </form>

@@ -61,27 +61,17 @@ export default function CategoriesPage() {
             +
           </button>
         </form>
-        {error && <p style={{ color: 'var(--danger)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
+        {error && <div className="banner-error" style={{ marginBottom: 12 }}>{error}</div>}
 
         {isLoading ? (
           <div className="spinner" />
         ) : (
           categories?.map((cat) => (
-            <div key={cat._id} className="list-row">
+            <div key={cat._id} className="list-row static">
               <div className="expense-icon">{iconForCategory(cat.name)}</div>
               <p style={{ flex: 1, fontWeight: 600 }}>{cat.name}</p>
               {cat.isDefault ? (
-                <span
-                  style={{
-                    fontSize: 12,
-                    color: 'var(--text-muted)',
-                    background: 'var(--page)',
-                    padding: '2px 8px',
-                    borderRadius: 999,
-                  }}
-                >
-                  Default
-                </span>
+                <span className="category-badge">Default</span>
               ) : (
                 <button
                   type="button"

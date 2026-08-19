@@ -17,9 +17,33 @@ export default function MorePage() {
       <PageHeader title="More" />
       <div className="app-content">
         {username && (
-          <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 16 }}>
-            Logged in as <strong>{username}</strong>
-          </p>
+          <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: '50%',
+                background: 'linear-gradient(160deg, var(--primary), var(--primary-dark))',
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 800,
+                fontSize: 16,
+                flexShrink: 0,
+              }}
+            >
+              {username.slice(0, 1).toUpperCase()}
+            </div>
+            <div>
+              <p className="expense-category" style={{ margin: 0 }}>
+                {username}
+              </p>
+              <p className="expense-meta" style={{ margin: '2px 0 0' }}>
+                Logged in
+              </p>
+            </div>
+          </div>
         )}
         {ITEMS.map((item) => (
           <div key={item.to} className="list-row" role="button" tabIndex={0} onClick={() => navigate(item.to)}>
@@ -32,9 +56,9 @@ export default function MorePage() {
           </div>
         ))}
         <div className="list-row" role="button" tabIndex={0} onClick={logout}>
-          <div className="expense-icon">🚪</div>
+          <div className="expense-icon" style={{ background: 'var(--danger-soft)' }}>🚪</div>
           <div style={{ flex: 1 }}>
-            <p className="expense-category">Log Out</p>
+            <p className="expense-category" style={{ color: 'var(--danger)' }}>Log Out</p>
             <p className="expense-meta">Sign out of this device</p>
           </div>
         </div>

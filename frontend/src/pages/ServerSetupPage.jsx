@@ -32,23 +32,18 @@ export default function ServerSetupPage() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100dvh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 24,
-      }}
-    >
-      <div style={{ maxWidth: 420, width: '100%', textAlign: 'center' }}>
-        <div style={{ fontSize: 48 }}>💰</div>
-        <h1 style={{ fontSize: 22, margin: '16px 0 8px' }}>Connect to your backend</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>
+    <div className="auth-screen">
+      <div className="auth-card">
+        <div className="auth-badge">💰</div>
+        <h1 className="auth-title">Connect to your backend</h1>
+        <p className="auth-subtitle">
           This app talks to the Expense Tracker server running on your PC. Enter your PC's local
           network address below, e.g. <strong>http://192.168.1.10:5001</strong>. This device must
           be on the same Wi-Fi network as the PC.
         </p>
+
+        {error && <div className="auth-error">{error}</div>}
+
         <input
           className="text-input"
           placeholder="http://192.168.1.10:5001"
@@ -56,13 +51,13 @@ export default function ServerSetupPage() {
           onChange={(e) => setUrl(e.target.value)}
           autoCapitalize="none"
           autoCorrect="off"
-          style={{ marginBottom: 12 }}
+          keyboardType="url"
         />
-        {error && <p style={{ color: 'var(--danger)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
-        <button className="button button-primary" onClick={handleSave} disabled={testing}>
+        <button type="button" className="button button-primary" onClick={handleSave} disabled={testing} style={{ marginTop: 4 }}>
           {testing ? 'Connecting…' : 'Connect'}
         </button>
-        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 20 }}>
+
+        <p className="auth-hint">
           Tip: On the PC, run <code>ipconfig</code> (Windows) to find its local IPv4 address, and
           make sure the backend was started with <code>npm run dev</code>.
         </p>
