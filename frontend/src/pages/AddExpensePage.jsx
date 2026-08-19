@@ -7,7 +7,6 @@ import ReceiptPicker from '../components/ReceiptPicker';
 import { listCategories } from '../api/categories';
 import { createExpense, updateExpense, getExpense } from '../api/expenses';
 import { toApiDateString } from '../utils/format';
-import { iconForCategory } from '../theme';
 
 const PAYMENT_METHODS = ['Cash', 'UPI', 'Card', 'Bank Transfer', 'Other'];
 
@@ -116,45 +115,61 @@ export default function AddExpensePage() {
       <PageHeader title={isEdit ? 'Edit Expense' : 'Add Expense'} back={isEdit} />
       <div className="app-content">
         <form onSubmit={handleSubmit}>
-          <span className="field-label" style={{ marginTop: 0 }}>
-            Date
-          </span>
-          <input
-            type="date"
-            className="text-input"
-            value={date}
-            max={toApiDateString(new Date())}
-            onChange={(e) => setDate(e.target.value)}
-          />
+          <div className="form-grid">
+            <div>
+              <span className="field-label" style={{ marginTop: 0 }}>
+                Date
+              </span>
+              <input
+                type="date"
+                className="text-input"
+                value={date}
+                max={toApiDateString(new Date())}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </div>
 
-          <span className="field-label">Amount</span>
-          <input
-            type="number"
-            inputMode="decimal"
-            step="0.01"
-            min="0"
-            className="text-input amount-input"
-            placeholder="0.00"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
+            <div>
+              <span className="field-label" style={{ marginTop: 0 }}>
+                Amount
+              </span>
+              <input
+                type="number"
+                inputMode="decimal"
+                step="0.01"
+                min="0"
+                className="text-input amount-input"
+                placeholder="0.00"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+            </div>
+          </div>
 
-          <span className="field-label">Category</span>
-          <select
-            className="select-input"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            {!category && <option value="">Select a category</option>}
-            {(categories || []).map((cat) => (
-              <option key={cat._id || cat.name} value={cat.name}>
-                {iconForCategory(cat.name)} {cat.name}
-              </option>
-            ))}
-          </select>
+          <div className="form-grid">
+            <div>
+              <span className="field-label">Category</span>
+              <input
+                type="text"
+                className="text-input"
+                placeholder="e.g. Food, Travel, Rent"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                list="category-suggestions"
+                autoComplete="off"
+              />
+              <datalist id="category-suggestions">
+                {(categories || []).map((cat) => (
+                  <option key={cat._id || cat.name} value={cat.name} />
+                ))}
+              </datalist>
+            </div>
 
-          <span className="field-label">Payment Method</span>
-          <ChipSelector options={PAYMENT_METHODS} value={paymentMethod} onChange={setPaymentMethod} />
+            <div>
+              <span className="field-label">Payment Method</span>
+              <ChipSelector options={PAYMENT_METHODS} value={paymentMethod} onChange={setPaymentMethod} />
+            </div>
+          </div>
 
           <span className="field-label">Description / Notes</span>
           <textarea

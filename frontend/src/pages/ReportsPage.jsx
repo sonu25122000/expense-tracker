@@ -70,38 +70,44 @@ export default function ReportsPage() {
               />
             </div>
 
-            <p className="section-title">Category-wise Spending</p>
-            {data.categoryBreakdown?.length ? (
-              <div className="card">
-                {data.categoryBreakdown.map((c) => (
-                  <div key={c.category} className="detail-row">
-                    <span className="detail-label">
-                      {c.category} ({c.count})
-                    </span>
-                    <span className="detail-value">{formatCurrency(c.total, currency)}</span>
+            <div className="charts-grid">
+              <div>
+                <p className="section-title">Category-wise Spending</p>
+                {data.categoryBreakdown?.length ? (
+                  <div className="card">
+                    {data.categoryBreakdown.map((c) => (
+                      <div key={c.category} className="detail-row">
+                        <span className="detail-label">
+                          {c.category} ({c.count})
+                        </span>
+                        <span className="detail-value">{formatCurrency(c.total, currency)}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <EmptyState icon="🏷️" title="No expenses in this period" />
+                )}
               </div>
-            ) : (
-              <EmptyState icon="🏷️" title="No expenses in this period" />
-            )}
 
-            <p className="section-title">{bucketLabel}-wise Spending</p>
-            {chartData.length ? (
-              <div className="chart-card">
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={chartData} margin={{ left: -20, right: 12 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="label" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} interval="preserveStartEnd" />
-                    <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
-                    <Tooltip formatter={(v) => formatCurrency(v, currency)} />
-                    <Bar dataKey="total" fill="#2a78d6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+              <div>
+                <p className="section-title">{bucketLabel}-wise Spending</p>
+                {chartData.length ? (
+                  <div className="chart-card">
+                    <ResponsiveContainer width="100%" height={220}>
+                      <BarChart data={chartData} margin={{ left: -20, right: 12 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                        <XAxis dataKey="label" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} interval="preserveStartEnd" />
+                        <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                        <Tooltip formatter={(v) => formatCurrency(v, currency)} />
+                        <Bar dataKey="total" fill="#2a78d6" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <EmptyState icon="📉" title="No expenses in this period" />
+                )}
               </div>
-            ) : (
-              <EmptyState icon="📉" title="No expenses in this period" />
-            )}
+            </div>
           </>
         )}
       </div>

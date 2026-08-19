@@ -1,11 +1,24 @@
 const fs = require('fs');
 const path = require('path');
 const Expense = require('../models/Expense');
+const Category = require('../models/Category');
 const buildExpenseFilter = require('../utils/buildExpenseFilter');
 
 function receiptUrlFor(req, filename) {
   if (!filename) return null;
   return `${req.protocol}://${req.get('host')}/uploads/${filename}`;
+}
+
+// Category is a free-text field on expenses; auto-register anything new so it
+// shows up consistently in the Categories screen and filter suggestions.
+async function ensureCategoryExists(name) {
+  const trimmed = (name || '').trim();
+  if (!trimmed) return;
+  await Category.updateOne(
+    { name: trimmed },
+    { $setOnInsert: { name: trimmed, isDefault: false } },
+    { upsert: true }
+  );
 }
 
 exports.createExpense = async (req, res) => {
@@ -23,6 +36,7 @@ exports.createExpense = async (req, res) => {
       description: description || '',
       receiptUrl: req.file ? receiptUrlFor(req, req.file.filename) : null,
     });
+    await ensureCategoryExists(category);
 
     res.status(201).json(expense);
   } catch (err) {
@@ -59,7 +73,10 @@ exports.updateExpense = async (req, res) => {
     const { date, amount, category, paymentMethod, description, removeReceipt } = req.body;
     if (date) expense.date = new Date(date);
     if (amount !== undefined) expense.amount = Number(amount);
-    if (category) expense.category = category;
+    if (category) {
+      expense.category = category;
+      await ensureCategoryExists(category);
+    }
     if (paymentMethod) expense.paymentMethod = paymentMethod;
     if (description !== undefined) expense.description = description;
 
