@@ -47,7 +47,6 @@ export default function ReceiptPicker({ file, existingUrl, onChange }) {
         ref={inputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         style={{ display: 'none' }}
         onChange={(e) => {
           const picked = e.target.files?.[0];
