@@ -14,10 +14,8 @@ export function SettingsProvider({ children }) {
   useEffect(() => {
     const storedUrl = localStorage.getItem(SERVER_URL_KEY) || '';
     const storedCurrency = localStorage.getItem(CURRENCY_KEY) || '₹';
-    if (storedUrl) {
-      setServerUrlState(storedUrl);
-      setApiServerUrl(storedUrl);
-    }
+    setServerUrlState(storedUrl);
+    setApiServerUrl(storedUrl); // '' is valid: means same-origin
     setCurrencyState(storedCurrency);
     setLoaded(true);
   }, []);

@@ -8,11 +8,15 @@ let onUnauthorized = null;
 
 export function setServerUrl(url) {
   currentServerUrl = url ? url.replace(/\/+$/, '') : '';
-  apiClient.defaults.baseURL = currentServerUrl ? `${currentServerUrl}/api` : undefined;
+  // Blank = same-origin (relative /api) — used for the browser/PWA build, where
+  // the backend either serves this app directly or the dev server proxies /api.
+  apiClient.defaults.baseURL = currentServerUrl ? `${currentServerUrl}/api` : '/api';
 }
 
+// Absolute origin to use for non-axios requests (e.g. plain fetch() for exports).
+// Falls back to the page's own origin when no explicit server URL is set.
 export function getServerUrl() {
-  return currentServerUrl;
+  return currentServerUrl || window.location.origin;
 }
 
 export function setAuthToken(token) {

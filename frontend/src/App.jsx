@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Capacitor } from '@capacitor/core';
 import { SettingsProvider, useSettings } from './context/SettingsContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import AppShell from './components/AppShell';
@@ -77,7 +78,10 @@ function Gate() {
   const { serverUrl, loaded } = useSettings();
 
   if (!loaded) return null;
-  if (!serverUrl) return <ServerSetupPage />;
+  // Only the installed native app (Android APK) runs on a separate device from
+  // the backend and needs an explicit address. The browser/PWA build always
+  // talks to same-origin /api (see api/client.js), so it works with zero setup.
+  if (Capacitor.isNativePlatform() && !serverUrl) return <ServerSetupPage />;
 
   return (
     <AuthProvider>

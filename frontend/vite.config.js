@@ -8,6 +8,10 @@ export default defineConfig({
   server: {
     port: 5199,
     strictPort: true,
+    proxy: {
+      '/api': 'http://localhost:5001',
+      '/uploads': 'http://localhost:5001',
+    },
   },
   plugins: [
     react(),

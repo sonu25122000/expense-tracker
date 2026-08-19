@@ -28,8 +28,19 @@ app.use('/api/dashboard', requireAuth, dashboardRoutes);
 app.use('/api/reports', requireAuth, reportRoutes);
 app.use('/api/export', requireAuth, exportRoutes);
 
-app.use((req, res) => {
-  res.status(404).json({ message: 'Not found' });
+// Serve the built frontend (frontend/npm run build) so opening this server's
+// own address in a browser is a complete, zero-config app — no separate dev
+// server or backend-address setup needed.
+const frontendDist = path.join(__dirname, '..', '..', 'frontend', 'dist');
+app.use(express.static(frontendDist));
+
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ message: 'Not found' });
+  }
+  res.sendFile(path.join(frontendDist, 'index.html'), (err) => {
+    if (err) res.status(404).json({ message: 'Not found' });
+  });
 });
 
 app.use((err, req, res, next) => {
