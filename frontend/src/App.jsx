@@ -14,7 +14,6 @@ import AddExpensePage from './pages/AddExpensePage';
 import ExpenseDetailsPage from './pages/ExpenseDetailsPage';
 import ReportsPage from './pages/ReportsPage';
 import MorePage from './pages/MorePage';
-import CategoriesPage from './pages/CategoriesPage';
 import ExportPage from './pages/ExportPage';
 
 const queryClient = new QueryClient({
@@ -47,7 +46,6 @@ function AuthGate() {
           <Route path="/more" element={<MorePage />} />
           <Route path="/expenses/:id" element={<ExpenseDetailsPage />} />
           <Route path="/expenses/:id/edit" element={<AddExpensePage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/export" element={<ExportPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

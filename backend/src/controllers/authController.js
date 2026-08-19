@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const seedDefaultCategoriesForUser = require('../utils/seedCategories');
 
 function issueToken(user) {
   return jwt.sign({ sub: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: '90d' });
@@ -22,7 +21,6 @@ exports.register = async (req, res) => {
     }
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({ username: trimmedUsername, passwordHash });
-    await seedDefaultCategoriesForUser(user._id);
     const token = issueToken(user);
     res.status(201).json({ token, username: user.username });
   } catch (err) {

@@ -3,7 +3,6 @@ import PageHeader from '../components/PageHeader';
 import { useAuth } from '../context/AuthContext';
 
 const ITEMS = [
-  { to: '/categories', label: 'Categories', icon: '🏷️', desc: 'Manage default & custom categories' },
   { to: '/export', label: 'Export / Download', icon: '⬇️', desc: 'Export expenses as PDF or Excel' },
 ];
 

@@ -5,7 +5,6 @@ const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const expenseRoutes = require('./routes/expenses');
-const categoryRoutes = require('./routes/categories');
 const dashboardRoutes = require('./routes/dashboard');
 const reportRoutes = require('./routes/reports');
 const exportRoutes = require('./routes/export');
@@ -23,7 +22,6 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRoutes);
 
 app.use('/api/expenses', requireAuth, expenseRoutes);
-app.use('/api/categories', requireAuth, categoryRoutes);
 app.use('/api/dashboard', requireAuth, dashboardRoutes);
 app.use('/api/reports', requireAuth, reportRoutes);
 app.use('/api/export', requireAuth, exportRoutes);
