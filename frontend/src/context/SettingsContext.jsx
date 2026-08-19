@@ -4,13 +4,12 @@ import { setServerUrl as setApiServerUrl } from '../api/client';
 import { DEFAULT_SERVER_URL } from '../config';
 
 const SERVER_URL_KEY = 'expense_tracker_server_url';
-const CURRENCY_KEY = 'expense_tracker_currency';
+const CURRENCY = '₹';
 
 const SettingsContext = createContext(null);
 
 export function SettingsProvider({ children }) {
   const [serverUrl, setServerUrlState] = useState('');
-  const [currency, setCurrencyState] = useState('₹');
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -18,10 +17,8 @@ export function SettingsProvider({ children }) {
     if (!storedUrl && Capacitor.isNativePlatform() && DEFAULT_SERVER_URL) {
       storedUrl = DEFAULT_SERVER_URL;
     }
-    const storedCurrency = localStorage.getItem(CURRENCY_KEY) || '₹';
     setServerUrlState(storedUrl);
     setApiServerUrl(storedUrl); // '' is valid: means same-origin
-    setCurrencyState(storedCurrency);
     setLoaded(true);
   }, []);
 
@@ -31,15 +28,8 @@ export function SettingsProvider({ children }) {
     localStorage.setItem(SERVER_URL_KEY, url);
   }, []);
 
-  const updateCurrency = useCallback((symbol) => {
-    setCurrencyState(symbol);
-    localStorage.setItem(CURRENCY_KEY, symbol);
-  }, []);
-
   return (
-    <SettingsContext.Provider
-      value={{ serverUrl, updateServerUrl, currency, updateCurrency, loaded }}
-    >
+    <SettingsContext.Provider value={{ serverUrl, updateServerUrl, currency: CURRENCY, loaded }}>
       {children}
     </SettingsContext.Provider>
   );

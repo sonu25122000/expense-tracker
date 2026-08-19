@@ -1,39 +1,16 @@
 import { useState } from 'react';
-import { format, startOfMonth, startOfToday, subDays } from 'date-fns';
 import PageHeader from '../components/PageHeader';
-import ChipSelector from '../components/ChipSelector';
 import { exportAndShare } from '../api/exportApi';
 
-const RANGE_PRESETS = [
-  { value: 'month', label: 'This Month' },
-  { value: '7', label: 'Last 7 Days' },
-  { value: '30', label: 'Last 30 Days' },
-  { value: 'all', label: 'All Time' },
-  { value: 'custom', label: 'Custom' },
-];
-
-const PAYMENT_METHODS = ['All', 'Cash', 'UPI', 'Card', 'Bank Transfer', 'Other'];
-
-function presetToRange(preset, start, end) {
-  const today = startOfToday();
-  if (preset === 'month') return { startDate: format(startOfMonth(today), 'yyyy-MM-dd'), endDate: format(today, 'yyyy-MM-dd') };
-  if (preset === '7') return { startDate: format(subDays(today, 6), 'yyyy-MM-dd'), endDate: format(today, 'yyyy-MM-dd') };
-  if (preset === '30') return { startDate: format(subDays(today, 29), 'yyyy-MM-dd'), endDate: format(today, 'yyyy-MM-dd') };
-  if (preset === 'custom') return { startDate: start || undefined, endDate: end || undefined };
-  return {};
-}
-
 export default function ExportPage() {
-  const [rangePreset, setRangePreset] = useState('month');
-  const [customStart, setCustomStart] = useState(format(subDays(new Date(), 7), 'yyyy-MM-dd'));
-  const [customEnd, setCustomEnd] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [paymentMethod, setPaymentMethod] = useState('All');
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
   const [busy, setBusy] = useState(null); // 'pdf' | 'excel' | null
   const [message, setMessage] = useState(null); // { type, text }
 
   const buildFilters = () => ({
-    ...presetToRange(rangePreset, customStart, customEnd),
-    paymentMethod: paymentMethod === 'All' ? undefined : paymentMethod,
+    startDate: customStart || undefined,
+    endDate: customEnd || undefined,
   });
 
   const handleExport = async (type) => {
@@ -56,16 +33,10 @@ export default function ExportPage() {
         <span className="field-label" style={{ marginTop: 0 }}>
           Date Range
         </span>
-        <ChipSelector options={RANGE_PRESETS} value={rangePreset} onChange={setRangePreset} />
-        {rangePreset === 'custom' && (
-          <div className="form-row" style={{ marginTop: 12 }}>
-            <input type="date" className="text-input" value={customStart} onChange={(e) => setCustomStart(e.target.value)} />
-            <input type="date" className="text-input" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} />
-          </div>
-        )}
-
-        <span className="field-label">Payment Method</span>
-        <ChipSelector options={PAYMENT_METHODS} value={paymentMethod} onChange={setPaymentMethod} />
+        <div className="form-row">
+          <input type="date" className="text-input" value={customStart} onChange={(e) => setCustomStart(e.target.value)} />
+          <input type="date" className="text-input" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} />
+        </div>
 
         <div className="form-row" style={{ marginTop: 24 }}>
           <button className="button button-primary" onClick={() => handleExport('pdf')} disabled={busy !== null}>
