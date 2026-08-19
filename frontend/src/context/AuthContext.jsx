@@ -29,7 +29,6 @@ export function AuthProvider({ children }) {
   }, [logout]);
 
   const refreshStatus = useCallback(async () => {
-    if (!serverUrl) return;
     setChecking(true);
     setError('');
     try {
@@ -40,13 +39,9 @@ export function AuthProvider({ children }) {
     } finally {
       setChecking(false);
     }
-  }, [serverUrl]);
+  }, []);
 
   useEffect(() => {
-    if (!serverUrl) {
-      setChecking(false);
-      return;
-    }
     const storedToken = localStorage.getItem(TOKEN_KEY) || '';
     const storedUsername = localStorage.getItem(USERNAME_KEY) || '';
     if (storedToken) {
