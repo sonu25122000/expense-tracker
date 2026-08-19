@@ -16,13 +16,13 @@ export default function ServerSetupPage() {
     }
     setTesting(true);
     setError('');
+    const prevBase = apiClient.defaults.baseURL;
     try {
-      const prevBase = apiClient.defaults.baseURL;
       apiClient.defaults.baseURL = `${trimmed}/api`;
       await apiClient.get('/health', { timeout: 6000 });
-      apiClient.defaults.baseURL = prevBase;
       updateServerUrl(trimmed);
     } catch (err) {
+      apiClient.defaults.baseURL = prevBase;
       setError(
         'Could not connect. Make sure the backend server is running and this device is on the same Wi-Fi network as your PC.'
       );

@@ -20,13 +20,14 @@ export default function SettingsPage() {
     }
     setTesting(true);
     setMessage('');
+    const prevBase = apiClient.defaults.baseURL;
     try {
-      const prevBase = apiClient.defaults.baseURL;
       apiClient.defaults.baseURL = `${trimmed}/api`;
       await apiClient.get('/health', { timeout: 6000 });
       updateServerUrl(trimmed);
       setMessage('Connected and saved.');
     } catch (err) {
+      apiClient.defaults.baseURL = prevBase;
       setMessage('Could not connect. Check the address and that the server is running.');
     } finally {
       setTesting(false);
