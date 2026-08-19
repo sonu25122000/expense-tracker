@@ -16,7 +16,6 @@ import ReportsPage from './pages/ReportsPage';
 import MorePage from './pages/MorePage';
 import CategoriesPage from './pages/CategoriesPage';
 import ExportPage from './pages/ExportPage';
-import SettingsPage from './pages/SettingsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30000 } },
@@ -50,7 +49,6 @@ function AuthGate() {
           <Route path="/expenses/:id/edit" element={<AddExpensePage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/export" element={<ExportPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

@@ -1,15 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  startOfToday,
-  subDays,
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth,
-  format,
-} from 'date-fns';
 import PageHeader from '../components/PageHeader';
 import ChipSelector from '../components/ChipSelector';
 import ExpenseListItem from '../components/ExpenseListItem';
@@ -19,42 +10,7 @@ import { listExpenses, deleteExpense } from '../api/expenses';
 import { formatCurrency } from '../utils/format';
 import { useSettings } from '../context/SettingsContext';
 
-const DATE_PRESETS = [
-  { value: 'all', label: 'All Time' },
-  { value: 'today', label: 'Today' },
-  { value: 'yesterday', label: 'Yesterday' },
-  { value: 'week', label: 'This Week' },
-  { value: 'month', label: 'This Month' },
-  { value: 'custom', label: 'Custom' },
-];
-
 const PAYMENT_METHODS = ['All', 'Cash', 'UPI', 'Card', 'Bank Transfer', 'Other'];
-
-function presetToRange(preset, customStart, customEnd) {
-  const today = startOfToday();
-  switch (preset) {
-    case 'today':
-      return { startDate: format(today, 'yyyy-MM-dd'), endDate: format(today, 'yyyy-MM-dd') };
-    case 'yesterday': {
-      const y = subDays(today, 1);
-      return { startDate: format(y, 'yyyy-MM-dd'), endDate: format(y, 'yyyy-MM-dd') };
-    }
-    case 'week':
-      return {
-        startDate: format(startOfWeek(today), 'yyyy-MM-dd'),
-        endDate: format(endOfWeek(today), 'yyyy-MM-dd'),
-      };
-    case 'month':
-      return {
-        startDate: format(startOfMonth(today), 'yyyy-MM-dd'),
-        endDate: format(endOfMonth(today), 'yyyy-MM-dd'),
-      };
-    case 'custom':
-      return { startDate: customStart || undefined, endDate: customEnd || undefined };
-    default:
-      return {};
-  }
-}
 
 export default function ExpenseHistoryPage() {
   const navigate = useNavigate();
@@ -62,9 +18,8 @@ export default function ExpenseHistoryPage() {
   const queryClient = useQueryClient();
 
   const [search, setSearch] = useState('');
-  const [datePreset, setDatePreset] = useState('all');
-  const [customStart, setCustomStart] = useState(format(subDays(new Date(), 7), 'yyyy-MM-dd'));
-  const [customEnd, setCustomEnd] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('All');
   const [minAmount, setMinAmount] = useState('');
   const [maxAmount, setMaxAmount] = useState('');
@@ -72,13 +27,14 @@ export default function ExpenseHistoryPage() {
 
   const filters = useMemo(
     () => ({
-      ...presetToRange(datePreset, customStart, customEnd),
+      startDate: customStart || undefined,
+      endDate: customEnd || undefined,
       paymentMethod: paymentMethod === 'All' ? undefined : paymentMethod,
       minAmount: minAmount || undefined,
       maxAmount: maxAmount || undefined,
       search: search || undefined,
     }),
-    [datePreset, customStart, customEnd, paymentMethod, minAmount, maxAmount, search]
+    [customStart, customEnd, paymentMethod, minAmount, maxAmount, search]
   );
 
   const { data, isLoading } = useQuery({
@@ -108,23 +64,22 @@ export default function ExpenseHistoryPage() {
           onChange={(e) => setSearch(e.target.value)}
           style={{ margin: '12px 0' }}
         />
-        <ChipSelector options={DATE_PRESETS} value={datePreset} onChange={setDatePreset} />
-        {datePreset === 'custom' && (
-          <div className="form-row" style={{ margin: '8px 0' }}>
-            <input
-              type="date"
-              className="text-input"
-              value={customStart}
-              onChange={(e) => setCustomStart(e.target.value)}
-            />
-            <input
-              type="date"
-              className="text-input"
-              value={customEnd}
-              onChange={(e) => setCustomEnd(e.target.value)}
-            />
-          </div>
-        )}
+        <div className="form-row" style={{ margin: '8px 0' }}>
+          <input
+            type="date"
+            className="text-input"
+            placeholder="From"
+            value={customStart}
+            onChange={(e) => setCustomStart(e.target.value)}
+          />
+          <input
+            type="date"
+            className="text-input"
+            placeholder="To"
+            value={customEnd}
+            onChange={(e) => setCustomEnd(e.target.value)}
+          />
+        </div>
         <div style={{ margin: '8px 0' }}>
           <ChipSelector options={PAYMENT_METHODS} value={paymentMethod} onChange={setPaymentMethod} />
         </div>
