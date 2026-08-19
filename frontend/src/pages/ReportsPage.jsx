@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { format } from 'date-fns';
 import PageHeader from '../components/PageHeader';
 import ChipSelector from '../components/ChipSelector';
 import SummaryCard from '../components/SummaryCard';
-import EmptyState from '../components/EmptyState';
 import { getReport } from '../api/reports';
-import { formatCurrency, formatDate } from '../utils/format';
+import { formatCurrency } from '../utils/format';
 import { useSettings } from '../context/SettingsContext';
 
 const PERIODS = [
@@ -28,10 +26,6 @@ export default function ReportsPage() {
   });
 
   const bucketLabel = period === 'yearly' ? 'Month' : 'Day';
-  const chartData = (data?.breakdown || []).map((b) => ({
-    label: period === 'yearly' ? format(new Date(`${b.bucket}-01`), 'MMM') : formatDate(b.bucket, 'd MMM'),
-    total: b.total,
-  }));
 
   return (
     <>
@@ -49,62 +43,25 @@ export default function ReportsPage() {
         {isLoading || !data ? (
           <div className="spinner" />
         ) : (
-          <>
-            <div className="summary-grid">
-              <SummaryCard icon="💰" label="Total" value={formatCurrency(data.total, currency)} />
-              <SummaryCard icon="🧾" label="Transactions" value={String(data.transactionCount)} />
-              <SummaryCard
-                icon="🔺"
-                label={`Highest Spending ${bucketLabel}`}
-                value={
-                  data.highestSpendingBucket
-                    ? formatCurrency(data.highestSpendingBucket.total, currency)
-                    : '—'
-                }
-                sublabel={data.highestSpendingBucket?.bucket}
-              />
-              <SummaryCard
-                icon="📊"
-                label={`Average per ${bucketLabel}`}
-                value={formatCurrency(data.averagePerBucket, currency)}
-              />
-            </div>
-
-            <div className="charts-grid">
-              <div className="chart-card">
-                <p className="chart-card-title">Category-wise Spending</p>
-                {data.categoryBreakdown?.length ? (
-                  data.categoryBreakdown.map((c) => (
-                    <div key={c.category} className="detail-row">
-                      <span className="detail-label">
-                        {c.category} ({c.count})
-                      </span>
-                      <span className="detail-value">{formatCurrency(c.total, currency)}</span>
-                    </div>
-                  ))
-                ) : (
-                  <EmptyState icon="🏷️" title="No expenses in this period" />
-                )}
-              </div>
-
-              <div className="chart-card">
-                <p className="chart-card-title">{bucketLabel}-wise Spending</p>
-                {chartData.length ? (
-                  <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={chartData} margin={{ left: -20, right: 12 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                      <XAxis dataKey="label" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} interval="preserveStartEnd" />
-                      <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
-                      <Tooltip formatter={(v) => formatCurrency(v, currency)} />
-                      <Bar dataKey="total" fill="#2a78d6" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <EmptyState icon="📉" title="No expenses in this period" />
-                )}
-              </div>
-            </div>
-          </>
+          <div className="summary-grid">
+            <SummaryCard icon="💰" label="Total" value={formatCurrency(data.total, currency)} />
+            <SummaryCard icon="🧾" label="Transactions" value={String(data.transactionCount)} />
+            <SummaryCard
+              icon="🔺"
+              label={`Highest Spending ${bucketLabel}`}
+              value={
+                data.highestSpendingBucket
+                  ? formatCurrency(data.highestSpendingBucket.total, currency)
+                  : '—'
+              }
+              sublabel={data.highestSpendingBucket?.bucket}
+            />
+            <SummaryCard
+              icon="📊"
+              label={`Average per ${bucketLabel}`}
+              value={formatCurrency(data.averagePerBucket, currency)}
+            />
+          </div>
         )}
       </div>
     </>
