@@ -16,7 +16,7 @@ function rangeLabel(query) {
 
 exports.exportPdf = async (req, res) => {
   try {
-    const filter = buildExpenseFilter(req.query);
+    const filter = { owner: req.userId, ...buildExpenseFilter(req.query) };
     const expenses = await Expense.find(filter).sort({ date: -1 });
     const total = expenses.reduce((sum, e) => sum + e.amount, 0);
 
@@ -77,7 +77,7 @@ exports.exportPdf = async (req, res) => {
 
 exports.exportExcel = async (req, res) => {
   try {
-    const filter = buildExpenseFilter(req.query);
+    const filter = { owner: req.userId, ...buildExpenseFilter(req.query) };
     const expenses = await Expense.find(filter).sort({ date: -1 });
     const total = expenses.reduce((sum, e) => sum + e.amount, 0);
 

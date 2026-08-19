@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { setServerUrl as setApiServerUrl } from '../api/client';
+import { DEFAULT_SERVER_URL } from '../config';
 
 const SERVER_URL_KEY = 'expense_tracker_server_url';
 const CURRENCY_KEY = 'expense_tracker_currency';
@@ -12,7 +14,10 @@ export function SettingsProvider({ children }) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const storedUrl = localStorage.getItem(SERVER_URL_KEY) || '';
+    let storedUrl = localStorage.getItem(SERVER_URL_KEY) || '';
+    if (!storedUrl && Capacitor.isNativePlatform() && DEFAULT_SERVER_URL) {
+      storedUrl = DEFAULT_SERVER_URL;
+    }
     const storedCurrency = localStorage.getItem(CURRENCY_KEY) || '₹';
     setServerUrlState(storedUrl);
     setApiServerUrl(storedUrl); // '' is valid: means same-origin

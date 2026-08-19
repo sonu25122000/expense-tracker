@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Expense = require('../models/Expense');
 const {
   startOfDay,
@@ -9,9 +10,9 @@ const {
   addDays,
 } = require('../utils/dateRanges');
 
-async function sumInRange(start, end) {
+async function sumInRange(owner, start, end) {
   const result = await Expense.aggregate([
-    { $match: { date: { $gte: start, $lte: end } } },
+    { $match: { owner, date: { $gte: start, $lte: end } } },
     { $group: { _id: null, total: { $sum: '$amount' } } },
   ]);
   return result.length ? result[0].total : 0;
@@ -19,6 +20,7 @@ async function sumInRange(start, end) {
 
 exports.getSummary = async (req, res) => {
   try {
+    const owner = new mongoose.Types.ObjectId(req.userId);
     const now = new Date();
 
     const todayStart = startOfDay(now);
@@ -29,25 +31,25 @@ exports.getSummary = async (req, res) => {
     const monthEnd = endOfMonth(now);
 
     const [totalToday, totalThisWeek, totalThisMonth, totalTransactions, highest] = await Promise.all([
-      sumInRange(todayStart, todayEnd),
-      sumInRange(weekStart, weekEnd),
-      sumInRange(monthStart, monthEnd),
-      Expense.countDocuments(),
-      Expense.findOne().sort({ amount: -1 }),
+      sumInRange(owner, todayStart, todayEnd),
+      sumInRange(owner, weekStart, weekEnd),
+      sumInRange(owner, monthStart, monthEnd),
+      Expense.countDocuments({ owner }),
+      Expense.findOne({ owner }).sort({ amount: -1 }),
     ]);
 
     const daysElapsedThisMonth = Math.floor((todayStart - monthStart) / 86400000) + 1;
     const averageDailyExpense = totalThisMonth / daysElapsedThisMonth;
 
     const categoryBreakdown = await Expense.aggregate([
-      { $match: { date: { $gte: monthStart, $lte: monthEnd } } },
+      { $match: { owner, date: { $gte: monthStart, $lte: monthEnd } } },
       { $group: { _id: '$category', total: { $sum: '$amount' }, count: { $sum: 1 } } },
       { $sort: { total: -1 } },
       { $project: { _id: 0, category: '$_id', total: 1, count: 1 } },
     ]);
 
     const paymentMethodBreakdown = await Expense.aggregate([
-      { $match: { date: { $gte: monthStart, $lte: monthEnd } } },
+      { $match: { owner, date: { $gte: monthStart, $lte: monthEnd } } },
       { $group: { _id: '$paymentMethod', total: { $sum: '$amount' }, count: { $sum: 1 } } },
       { $sort: { total: -1 } },
       { $project: { _id: 0, paymentMethod: '$_id', total: 1, count: 1 } },
@@ -55,7 +57,7 @@ exports.getSummary = async (req, res) => {
 
     const trendStart = startOfDay(addDays(now, -29));
     const dailyTrendRaw = await Expense.aggregate([
-      { $match: { date: { $gte: trendStart, $lte: todayEnd } } },
+      { $match: { owner, date: { $gte: trendStart, $lte: todayEnd } } },
       {
         $group: {
           _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },

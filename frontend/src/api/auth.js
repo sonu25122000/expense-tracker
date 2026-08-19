@@ -1,12 +1,7 @@
 import { apiClient } from './client';
 
-export async function getAuthStatus() {
-  const { data } = await apiClient.get('/auth/status');
-  return data;
-}
-
-export async function setupAccount(username, password) {
-  const { data } = await apiClient.post('/auth/setup', { username, password });
+export async function register(username, password) {
+  const { data } = await apiClient.post('/auth/register', { username, password });
   return data;
 }
 

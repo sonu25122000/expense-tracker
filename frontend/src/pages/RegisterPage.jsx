@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-export default function AccountSetupPage() {
-  const { setup } = useAuth();
+export default function RegisterPage({ onSwitchToLogin }) {
+  const { register } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -26,7 +26,7 @@ export default function AccountSetupPage() {
     }
     setBusy(true);
     try {
-      await setup(username.trim(), password);
+      await register(username.trim(), password);
     } catch (err) {
       setError(err?.response?.data?.message || 'Could not create account.');
     } finally {
@@ -37,11 +37,10 @@ export default function AccountSetupPage() {
   return (
     <div className="auth-screen">
       <form className="auth-card" onSubmit={handleSubmit}>
-        <div className="auth-badge">🔐</div>
+        <div className="auth-badge">💰</div>
         <h1 className="auth-title">Create your account</h1>
         <p className="auth-subtitle">
-          Set a username and password to protect access to your expenses. You'll use this to log
-          in every time you open the app.
+          Sign up to start tracking your expenses. Your data is private to your account.
         </p>
 
         {error && <div className="auth-error">{error}</div>}
@@ -71,6 +70,17 @@ export default function AccountSetupPage() {
         <button type="submit" className="button button-primary" disabled={busy} style={{ marginTop: 4 }}>
           {busy ? 'Creating…' : 'Create Account'}
         </button>
+
+        <p className="auth-hint">
+          Already have an account?{' '}
+          <button
+            type="button"
+            onClick={onSwitchToLogin}
+            style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 700, cursor: 'pointer', padding: 0 }}
+          >
+            Log in
+          </button>
+        </p>
       </form>
     </div>
   );

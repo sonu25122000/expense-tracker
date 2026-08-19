@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-export default function LoginPage() {
+export default function LoginPage({ onSwitchToRegister }) {
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -48,6 +48,17 @@ export default function LoginPage() {
         <button type="submit" className="button button-primary" disabled={busy} style={{ marginTop: 4 }}>
           {busy ? 'Logging in…' : 'Log In'}
         </button>
+
+        <p className="auth-hint">
+          Don't have an account?{' '}
+          <button
+            type="button"
+            onClick={onSwitchToRegister}
+            style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: 700, cursor: 'pointer', padding: 0 }}
+          >
+            Sign up
+          </button>
+        </p>
       </form>
     </div>
   );

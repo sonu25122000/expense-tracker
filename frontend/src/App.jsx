@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Capacitor } from '@capacitor/core';
@@ -5,7 +6,7 @@ import { SettingsProvider, useSettings } from './context/SettingsContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import AppShell from './components/AppShell';
 import ServerSetupPage from './pages/ServerSetupPage';
-import AccountSetupPage from './pages/AccountSetupPage';
+import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ExpenseHistoryPage from './pages/ExpenseHistoryPage';
@@ -22,35 +23,18 @@ const queryClient = new QueryClient({
 });
 
 function AuthGate() {
-  const { checking, accountConfigured, isAuthenticated, error } = useAuth();
+  const { loaded, isAuthenticated } = useAuth();
+  const [authView, setAuthView] = useState('login');
 
-  if (checking || accountConfigured === null) {
-    return (
-      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="spinner" />
-      </div>
+  if (!loaded) return null;
+
+  if (!isAuthenticated) {
+    return authView === 'register' ? (
+      <RegisterPage onSwitchToLogin={() => setAuthView('login')} />
+    ) : (
+      <LoginPage onSwitchToRegister={() => setAuthView('register')} />
     );
   }
-
-  if (error) {
-    return (
-      <div
-        style={{
-          minHeight: '100dvh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 24,
-          textAlign: 'center',
-        }}
-      >
-        <p style={{ color: 'var(--danger)' }}>{error}</p>
-      </div>
-    );
-  }
-
-  if (!accountConfigured) return <AccountSetupPage />;
-  if (!isAuthenticated) return <LoginPage />;
 
   return (
     <BrowserRouter>

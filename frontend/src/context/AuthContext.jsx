@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { setAuthToken, setUnauthorizedHandler } from '../api/client';
-import { getAuthStatus, setupAccount, login as loginRequest } from '../api/auth';
-import { useSettings } from './SettingsContext';
+import { register as registerRequest, login as loginRequest } from '../api/auth';
 
 const TOKEN_KEY = 'expense_tracker_token';
 const USERNAME_KEY = 'expense_tracker_username';
@@ -9,12 +8,9 @@ const USERNAME_KEY = 'expense_tracker_username';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const { serverUrl } = useSettings();
   const [token, setToken] = useState('');
   const [username, setUsername] = useState('');
-  const [accountConfigured, setAccountConfigured] = useState(null); // null = unknown
-  const [checking, setChecking] = useState(true);
-  const [error, setError] = useState('');
+  const [loaded, setLoaded] = useState(false);
 
   const logout = useCallback(() => {
     setToken('');
@@ -28,19 +24,6 @@ export function AuthProvider({ children }) {
     setUnauthorizedHandler(() => logout());
   }, [logout]);
 
-  const refreshStatus = useCallback(async () => {
-    setChecking(true);
-    setError('');
-    try {
-      const status = await getAuthStatus();
-      setAccountConfigured(status.configured);
-    } catch (err) {
-      setError('Could not reach the server to check account status.');
-    } finally {
-      setChecking(false);
-    }
-  }, []);
-
   useEffect(() => {
     const storedToken = localStorage.getItem(TOKEN_KEY) || '';
     const storedUsername = localStorage.getItem(USERNAME_KEY) || '';
@@ -49,26 +32,25 @@ export function AuthProvider({ children }) {
       setUsername(storedUsername);
       setAuthToken(storedToken);
     }
-    refreshStatus();
-  }, [serverUrl, refreshStatus]);
+    setLoaded(true);
+  }, []);
 
-  const handleSetup = useCallback(async (user, pass) => {
-    const data = await setupAccount(user, pass);
+  const persistSession = (data) => {
     setToken(data.token);
     setUsername(data.username);
     setAuthToken(data.token);
     localStorage.setItem(TOKEN_KEY, data.token);
     localStorage.setItem(USERNAME_KEY, data.username);
-    setAccountConfigured(true);
+  };
+
+  const handleRegister = useCallback(async (user, pass) => {
+    const data = await registerRequest(user, pass);
+    persistSession(data);
   }, []);
 
   const handleLogin = useCallback(async (user, pass) => {
     const data = await loginRequest(user, pass);
-    setToken(data.token);
-    setUsername(data.username);
-    setAuthToken(data.token);
-    localStorage.setItem(TOKEN_KEY, data.token);
-    localStorage.setItem(USERNAME_KEY, data.username);
+    persistSession(data);
   }, []);
 
   return (
@@ -77,10 +59,8 @@ export function AuthProvider({ children }) {
         token,
         username,
         isAuthenticated: Boolean(token),
-        accountConfigured,
-        checking,
-        error,
-        setup: handleSetup,
+        loaded,
+        register: handleRegister,
         login: handleLogin,
         logout,
       }}

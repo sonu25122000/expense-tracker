@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Expense = require('../models/Expense');
 const {
   startOfDay,
@@ -31,8 +32,9 @@ exports.getReport = async (req, res) => {
       ? req.query.period
       : 'monthly';
     const { start, end } = getRange(period, req.query.date);
+    const owner = new mongoose.Types.ObjectId(req.userId);
 
-    const match = { date: { $gte: start, $lte: end } };
+    const match = { owner, date: { $gte: start, $lte: end } };
 
     const [totalsResult, categoryBreakdown, paymentMethodBreakdown] = await Promise.all([
       Expense.aggregate([

@@ -13,15 +13,15 @@ const DEFAULT_CATEGORIES = [
   'Other',
 ];
 
-async function seedCategories() {
+async function seedDefaultCategoriesForUser(userId) {
   for (const name of DEFAULT_CATEGORIES) {
     await Category.updateOne(
-      { name },
-      { $setOnInsert: { name, isDefault: true } },
+      { owner: userId, name },
+      { $setOnInsert: { owner: userId, name, isDefault: true } },
       { upsert: true }
     );
   }
 }
 
-module.exports = seedCategories;
+module.exports = seedDefaultCategoriesForUser;
 module.exports.DEFAULT_CATEGORIES = DEFAULT_CATEGORIES;
