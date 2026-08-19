@@ -1,18 +1,20 @@
-const fs = require('fs');
-const path = require('path');
 const Expense = require('../models/Expense');
 const buildExpenseFilter = require('../utils/buildExpenseFilter');
-
-function receiptUrlFor(req, filename) {
-  if (!filename) return null;
-  return `${req.protocol}://${req.get('host')}/uploads/${filename}`;
-}
+const { uploadReceiptBuffer, deleteReceipt } = require('../utils/cloudinary');
 
 exports.createExpense = async (req, res) => {
   try {
     const { date, amount, category, paymentMethod, description } = req.body;
     if (!date || !amount || !category || !paymentMethod) {
       return res.status(400).json({ message: 'date, amount, category and paymentMethod are required' });
+    }
+
+    let receiptUrl = null;
+    let receiptPublicId = null;
+    if (req.file) {
+      const uploaded = await uploadReceiptBuffer(req.file.buffer);
+      receiptUrl = uploaded.url;
+      receiptPublicId = uploaded.publicId;
     }
 
     const expense = await Expense.create({
@@ -22,7 +24,8 @@ exports.createExpense = async (req, res) => {
       category,
       paymentMethod,
       description: description || '',
-      receiptUrl: req.file ? receiptUrlFor(req, req.file.filename) : null,
+      receiptUrl,
+      receiptPublicId,
     });
 
     res.status(201).json(expense);
@@ -67,11 +70,14 @@ exports.updateExpense = async (req, res) => {
     if (description !== undefined) expense.description = description;
 
     if (req.file) {
-      deleteReceiptFile(expense.receiptUrl);
-      expense.receiptUrl = receiptUrlFor(req, req.file.filename);
+      await deleteReceipt(expense.receiptPublicId);
+      const uploaded = await uploadReceiptBuffer(req.file.buffer);
+      expense.receiptUrl = uploaded.url;
+      expense.receiptPublicId = uploaded.publicId;
     } else if (removeReceipt === 'true' || removeReceipt === true) {
-      deleteReceiptFile(expense.receiptUrl);
+      await deleteReceipt(expense.receiptPublicId);
       expense.receiptUrl = null;
+      expense.receiptPublicId = null;
     }
 
     await expense.save();
@@ -85,17 +91,9 @@ exports.deleteExpense = async (req, res) => {
   try {
     const expense = await Expense.findOneAndDelete({ _id: req.params.id, owner: req.userId });
     if (!expense) return res.status(404).json({ message: 'Expense not found' });
-    deleteReceiptFile(expense.receiptUrl);
+    await deleteReceipt(expense.receiptPublicId);
     res.json({ message: 'Expense deleted', id: req.params.id });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
-
-function deleteReceiptFile(receiptUrl) {
-  if (!receiptUrl) return;
-  const filename = receiptUrl.split('/uploads/')[1];
-  if (!filename) return;
-  const filePath = path.join(__dirname, '..', '..', 'uploads', filename);
-  fs.unlink(filePath, () => {});
-}

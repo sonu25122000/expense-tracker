@@ -11,6 +11,7 @@ const expenseSchema = new mongoose.Schema(
     paymentMethod: { type: String, required: true, enum: PAYMENT_METHODS },
     description: { type: String, trim: true, default: '' },
     receiptUrl: { type: String, default: null },
+    receiptPublicId: { type: String, default: null },
   },
   { timestamps: true }
 );
